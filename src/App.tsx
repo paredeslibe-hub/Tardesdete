@@ -487,7 +487,7 @@ export default function App() {
       {/* HEADER */}
       <header className="bg-brand-cream py-2 border-b-2 border-brand-orange/10">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-center cursor-pointer" onClick={clearPilar}>
-          <img src="/logo.png" alt="Tardes de Té" className="w-[90px] h-auto md:w-[106px]" />
+          <img src="/logo.png" alt="Tardes de Té" className="w-[95px] h-auto md:w-[111px]" />
         </div>
       </header>
 
@@ -683,25 +683,28 @@ export default function App() {
           </section>
 
           {/* ABOUT */}
-          <section id="about" className="bg-brand-cream py-20 px-6 md:px-10 flex flex-col md:flex-row items-center min-h-[500px] relative">
-             <div className="absolute top-20 left-10 text-brand-orange opacity-40 transform -rotate-12">
+          <section id="about" className="flex flex-col md:flex-row w-full min-h-[500px] relative">
+             <div className="absolute top-10 left-10 text-brand-orange opacity-30 transform -rotate-12 z-10 hidden md:block">
                <Croissant size={60} strokeWidth={1.5} />
              </div>
-             <div className="w-full md:w-1/2 p-4 md:p-12 mb-10 md:mb-0 relative z-10">
+
+             {/* Texto — izquierda en desktop, abajo en mobile */}
+             <div className="w-full md:w-1/2 bg-brand-cream flex flex-col items-center justify-center p-10 text-center order-last md:order-first">
                <h2 className="font-sans text-5xl md:text-6xl font-black text-brand-orange mb-6">¿Quién soy?</h2>
-               <p className="font-sans text-lg text-brand-orange font-medium mb-6 leading-relaxed max-w-sm">
+               <p className="font-sans text-lg text-brand-orange font-medium mb-6 leading-relaxed text-pretty max-w-sm">
                  Hola soy Cami! Cocino desde toda la vida, pues, familia de panaderos. Encontré mi pasión por lo artesanal, dándole un toque mágico a cada uno de mis productos.
                </p>
-               <p className="font-script italic text-4xl mb-6 max-w-sm leading-tight text-brand-pink">
+               <p className="font-script italic text-4xl mb-6 leading-tight text-brand-pink text-pretty max-w-sm">
                  Priorizo la calidad y la frescura de los ingredientes y el amor a cada preparación.
                </p>
-               <p className="font-sans text-lg text-brand-orange font-medium mb-6 leading-relaxed max-w-sm">
+               <p className="font-sans text-lg text-brand-orange font-medium leading-relaxed text-pretty">
                  Los invito a disfrutar de mi mundo de sabores.
                </p>
              </div>
-             
-             <div className="w-full md:w-1/2 relative flex flex-col items-center p-4">
-<div className="w-[90%] max-w-[400px] aspect-square shape-leaf-2 overflow-hidden rounded-[40px] shadow-xl">
+
+             {/* Imagen — derecha en desktop, arriba en mobile */}
+             <div className="w-full md:w-1/2 bg-brand-cream flex items-center justify-center p-10 order-first md:order-last">
+               <div className="w-[90%] max-w-[420px] aspect-square shape-leaf-2 overflow-hidden rounded-[40px] shadow-xl">
                  <img referrerPolicy="no-referrer" src="/cami.png" alt="Cami" className="w-full h-full object-cover object-top" />
                </div>
              </div>
