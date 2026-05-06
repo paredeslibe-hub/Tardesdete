@@ -1,0 +1,362 @@
+{
+  "desayunos": [
+    {
+      "id": "salamix",
+      "name": "Salamix",
+      "price": "$50.000",
+      "pax": "1 persona",
+      "description": "Caja con visor + stickers y tags. Infusiones surtidas, jugo de naranja, una torta a elección, 2 fosforitos, 2 medialunas, 2 sacramentos, scons de queso, palmeritas.",
+      "img": "/salamix.jpeg"
+    },
+    {
+      "id": "detodito",
+      "name": "De todito",
+      "price": "$52.000",
+      "pax": "1 persona",
+      "description": "Infusiones, jugo, 2 tortas, 2 brownies con nuez, 2 palmeritas XL, sconcitos de queso, pan para tostar, 2 medialunas, 2 fosforitos. Caja con visor + tarjeta.",
+      "img": "/de-todito.jpeg"
+    },
+    {
+      "id": "willywonka",
+      "name": "Willy Wonka",
+      "price": "$68.000",
+      "pax": "1 persona (Premium)",
+      "description": "Infusiones, jugo, 4 tortas a elección, 2 brownies, 2 palmeritas XL, sconcitos de queso, 2 medialunas, 2 fosforitos. Cajas con visor + tarjeta.",
+      "img": "/willy-wonka.jpeg"
+    }
+  ],
+  "eventos": [
+    {
+      "id": "festejito",
+      "name": "Festejito",
+      "price": "$110.000",
+      "pax": "10-12 personas",
+      "description": "12 fosforitos jamón/queso, 12 scons crudo/rúcula/queso, 12 scons dip queso azul/jamón, 24 pan brioche rellenos surtidos, 12 pizzetas con queso.",
+      "img": "/festejito.jpeg"
+    },
+    {
+      "id": "planazo",
+      "name": "Planazo",
+      "price": "$290.000",
+      "pax": "20-25 personas",
+      "description": "24 fosforitos, 12 scons crudo, 12 scons queso azul, 36 pan brioche surtidos, 24 pizzetas, 12 figazas roast beef, 12 figazas bondiola, 30 rollitos de miga.",
+      "img": "/planazo.jpeg"
+    },
+    {
+      "id": "full",
+      "name": "Full Tardes de Té",
+      "price": "$350.000",
+      "pax": "30-35 personas",
+      "description": "24 fosforitos, 12 scons crudo, 12 scons azul, 48 pan brioche, 36 pizzetas, 12 figazas roast beef, 12 bondiola, 12 pollo al verdeo, 30 rollitos miga.",
+      "img": "/full.jpeg"
+    }
+  ],
+  "pasteleria": [
+    {
+      "id": "pf-red-velvet",
+      "name": "Petit Fours: Red Velvet",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Pequeñas piezas (4-6 cm). En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-coco-ddl",
+      "name": "Petit Fours: Coco y DDL",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Tartitas de coco y dulce de leche (4-6 cm). En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-batata",
+      "name": "Petit Fours: Mini Frola Batata",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Mini frolas de batata (4-6 cm). En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-membrillo",
+      "name": "Petit Fours: Mini Frola Membrillo",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Mini frolas de membrillo (4-6 cm). En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-lemon",
+      "name": "Petit Fours: Lemon Pie",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Pequeñas piezas (4-6 cm) de Lemon pie. En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-brownie",
+      "name": "Petit Fours: Brownie",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Brownie con dulce de leche y crema/merengue (4-6 cm). En 1 docena podés elegir hasta 3 sabores.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-tiramisu",
+      "name": "Petit Fours: Tiramisú",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Pequeñas piezas (4-6 cm) de Tiramisú. En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-frutales",
+      "name": "Petit Fours: Frutales",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Tartitas frutales con dulce de leche/pastelera y chantilly (4-6 cm). Hasta 3 sabores por docena.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-banana",
+      "name": "Petit Fours: Banana",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Tartitas de banana con dulce de leche y chantilly / solo ddl (4-6 cm). Hasta 3 sabores por docena.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-chocotorta",
+      "name": "Petit Fours: Chocotorta",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Pequeñas piezas (4-6 cm) de Chocotorta. En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-cheesecake",
+      "name": "Petit Fours: Cheesecake",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Cheesecake de frutos rojos (4-6 cm). En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-oreo",
+      "name": "Petit Fours: Oreo",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Pequeñas piezas (4-6 cm) de Oreo. En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "pf-keylime",
+      "name": "Petit Fours: Key Lime Pie",
+      "price": "Consultar",
+      "pax": "Por Docena",
+      "description": "Pequeñas piezas (4-6 cm) de Key lime pie. En 1 docena podés elegir hasta 3 sabores en total.",
+      "img": "/petit-four.jpeg"
+    },
+    {
+      "id": "torta-oreo-25",
+      "name": "Torta Oreo (25 cm)",
+      "price": "$65.000",
+      "pax": "25 cm",
+      "description": "Torta entera con chocolatines.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-oreo-18",
+      "name": "Torta Oreo (18 cm)",
+      "price": "$50.000",
+      "pax": "18 cm",
+      "description": "Torta entera con chocolatines.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-cheese-25",
+      "name": "Cheesecake (25 cm)",
+      "price": "$60.000",
+      "pax": "25 cm",
+      "description": "Torta entera con frutos arriba.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-cheese-18",
+      "name": "Cheesecake (18 cm)",
+      "price": "$45.000",
+      "pax": "18 cm",
+      "description": "Torta entera de Cheesecake.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-brownie-25",
+      "name": "Torta Brownie (25 cm)",
+      "price": "$55.000",
+      "pax": "25 cm",
+      "description": "Con crema y frutillas.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-brownie-18",
+      "name": "Torta Brownie (18 cm)",
+      "price": "$45.000",
+      "pax": "18 cm",
+      "description": "Torta entera de Brownie.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-choco-26",
+      "name": "Chocotorta (26 cm)",
+      "price": "$65.000",
+      "pax": "26 cm",
+      "description": "Torta entera con chocolatines.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-choco-18",
+      "name": "Chocotorta (18 cm)",
+      "price": "$50.000",
+      "pax": "18 cm",
+      "description": "Torta entera con chocolatines.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-red-25",
+      "name": "Red Velvet (25 cm)",
+      "price": "$55.000",
+      "pax": "25 cm",
+      "description": "Torta entera Red velvet.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-red-18",
+      "name": "Red Velvet (18 cm)",
+      "price": "$40.000",
+      "pax": "18 cm",
+      "description": "Torta entera Red velvet.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-tiramisu-25",
+      "name": "Tiramisú (25 cm)",
+      "price": "$45.000",
+      "pax": "25 cm",
+      "description": "Torta entera Tiramisú.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-tiramisu-22",
+      "name": "Tiramisú Cuadrado (22 cm)",
+      "price": "$42.000",
+      "pax": "22 cm",
+      "description": "Torta entera Tiramisú cuadrado.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-tiramisu-18",
+      "name": "Tiramisú (18 cm)",
+      "price": "$35.000",
+      "pax": "18 cm",
+      "description": "Torta entera Tiramisú.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-coco-18",
+      "name": "Tarta de Coco (18 cm)",
+      "price": "$22.000",
+      "pax": "18 cm",
+      "description": "Tarta de coco entera.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-banana-18",
+      "name": "Tarta de Banana (18 cm)",
+      "price": "$26.000",
+      "pax": "18 cm",
+      "description": "Con dulce de leche y crema.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-banana-25",
+      "name": "Tarta de Banana (25 cm)",
+      "price": "$38.000",
+      "pax": "25 cm",
+      "description": "Con dulce de leche y crema.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-lemon-18",
+      "name": "Lemon Pie (18 cm)",
+      "price": "$35.000",
+      "pax": "18 cm",
+      "description": "Tarta Lemon Pie entera.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-lemon-25",
+      "name": "Lemon Pie (25 cm)",
+      "price": "$40.000",
+      "pax": "25 cm",
+      "description": "Tarta Lemon Pie entera.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-keylime-18",
+      "name": "Key Lime Pie (18 cm)",
+      "price": "$35.000",
+      "pax": "18 cm",
+      "description": "Tarta Key Lime Pie entera.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-keylime-25",
+      "name": "Key Lime Pie (25 cm)",
+      "price": "$40.000",
+      "pax": "25 cm",
+      "description": "Tarta Key Lime Pie entera.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-frutillas-var",
+      "name": "Tarta de Frutillas",
+      "price": "Consultar",
+      "pax": "18 cm y 25 cm",
+      "description": "Con pastelera y chantilly / ddl y chantilly.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-number-cake",
+      "name": "Number Cake / Letter Brownie",
+      "price": "Consultar",
+      "pax": "Personalizado",
+      "description": "Con crema.",
+      "img": "/tortas.jpeg"
+    },
+    {
+      "id": "torta-doble-number",
+      "name": "Doble Number o Letter Brownie",
+      "price": "Consultar",
+      "pax": "Personalizado",
+      "description": "Con crema.",
+      "img": "/tortas.jpeg"
+    }
+  ],
+  "saladitos": [
+    {
+      "id": "brioche-jamon-queso",
+      "name": "Pan Brioche",
+      "price": "$18.000",
+      "pax": "1 Docena",
+      "description": "Rellenos de jamón cocido y queso tybo. Masa suave y mantecosa.",
+      "img": "/saladitos.jpeg"
+    },
+    {
+      "id": "fosforitos",
+      "name": "Fosforitos",
+      "price": "$18.000",
+      "pax": "1 Docena",
+      "description": "Clásicos fosforitos de hojaldre glaseado, rellenos de jamón y queso.",
+      "img": "/fosforitos.jpeg"
+    }
+  ]
+}
