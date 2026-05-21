@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { saveOrderToSupabase } from "./lib/supabase";
+import { saveOrderToSupabase, supabase } from "./lib/supabase";
 import { Coffee, Cake, Croissant, Calendar, Clock, MapPin, Plus, Minus, User, Phone, Check, Instagram, ArrowRight, Trash2, X, Truck, Store } from "lucide-react";
 
 interface Pack {
@@ -41,9 +41,14 @@ const TORTAS_DESAYUNO = [
 ];
 
 const DESAYUNO_TORTA_COUNT: Record<string, number> = {
+  // IDs estáticos (legacy)
   salamix: 1,
   detodito: 2,
   willywonka: 4,
+  // Nombres desde Supabase (UUIDs como ID, lookup por nombre)
+  'Salamix': 1,
+  'De todito': 2,
+  'Willy Wonka': 4,
 };
 
 const PACKS = {
@@ -446,12 +451,41 @@ export default function App() {
   const [packs, setPacks] = useState<Record<string, Pack[]>>(PACKS);
   const [selectedCakes, setSelectedCakes] = useState<Record<string, string[]>>({});
 
-  // Load products from JSON
+  // Carga productos dinámicos desde Supabase
   useEffect(() => {
-    fetch('/products.json')
-      .then(response => response.json())
-      .then(data => setPacks(data as Record<string, Pack[]>))
-      .catch(error => console.error('Error loading products:', error));
+    supabase
+      .from('productos')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) { console.error('Error cargando productos:', error); return; }
+        if (!data?.length) return;
+
+        const toPackFormat = (p: {
+          id: string; nombre: string; precio: number;
+          descripcion: string | null; categoria: string; foto_url: string | null;
+        }): Pack => ({
+          id: p.id,
+          name: p.nombre,
+          price: `$${Number(p.precio).toLocaleString('es-AR')}`,
+          pax: p.categoria,
+          description: p.descripcion ?? '',
+          img: p.foto_url ?? IMAGE_MAP[p.id] ?? '/tortas.jpeg',
+        });
+
+        const desayunos = data.filter(p => p.pilar === 'desayuno').map(toPackFormat);
+        const eventos   = data.filter(p => p.pilar === 'evento').map(toPackFormat);
+        const saladitos = data.filter(p => p.pilar === 'saladito').map(toPackFormat);
+
+        // Solo sobreescribe una sección si Supabase devuelve datos para ella;
+        // pastelería permanece estática (UI especializada con dropdowns).
+        setPacks(prev => ({
+          ...prev,
+          ...(desayunos.length > 0 && { desayunos }),
+          ...(eventos.length   > 0 && { eventos }),
+          ...(saladitos.length > 0 && { saladitos }),
+        }));
+      });
   }, []);
 
   const handlePilarSelect = (pilar: 'desayunos' | 'eventos' | 'pasteleria' | 'saladitos') => {
@@ -962,12 +996,12 @@ function CatalogSection({
                           </button>
                        </div>
                      </div>
-                     {pilar === 'desayunos' && isSelected && DESAYUNO_TORTA_COUNT[pack.id] && (
+                     {pilar === 'desayunos' && isSelected && (DESAYUNO_TORTA_COUNT[pack.id] ?? DESAYUNO_TORTA_COUNT[pack.name]) && (
                        <div className="mt-4 pt-4 border-t border-brand-pink/10 space-y-2">
                          <p className="text-[10px] font-bold uppercase tracking-widest text-brand-pink ml-1">
-                           🍰 Elegí tu torta {DESAYUNO_TORTA_COUNT[pack.id] > 1 ? `(${DESAYUNO_TORTA_COUNT[pack.id]} opciones)` : ''}
+                           {(() => { const n = DESAYUNO_TORTA_COUNT[pack.id] ?? DESAYUNO_TORTA_COUNT[pack.name]; return `🍰 Elegí tu torta ${n > 1 ? `(${n} opciones)` : ''}`; })()}
                          </p>
-                         {Array.from({ length: DESAYUNO_TORTA_COUNT[pack.id] }).map((_, slotIdx) => (
+                         {Array.from({ length: DESAYUNO_TORTA_COUNT[pack.id] ?? DESAYUNO_TORTA_COUNT[pack.name] }).map((_, slotIdx) => (
                            <select
                              key={slotIdx}
                              className="w-full bg-brand-cream/40 border-2 border-brand-pink/30 rounded-2xl px-4 py-2.5 text-brand-orange font-medium text-sm focus:border-brand-pink focus:outline-none appearance-none"

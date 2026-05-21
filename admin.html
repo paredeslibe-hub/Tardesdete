@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Tardes de Té</title>
+
+  <!-- Google Fonts: Fredoka + Pinyon Script -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet" />
+
+  <!-- Supabase JS v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ─────────────────────────────────────────────────────
+       DESIGN TOKENS — Tardes de Té
+       Fuente: design-system.md
+    ───────────────────────────────────────────────────── */
+    :root {
+      --cream:        #FFF0E0;
+      --orange:       #FF5A00;
+      --orange-light: #FF7B33;
+      --pink:         #FF66B1;
+      --text:         #5a2d0c;
+      --text-muted:   #a07050;
+      --white:        #ffffff;
+      --danger:       #dc2626;
+      --border:       2.5px solid var(--orange);
+      --radius:       24px;
+      --radius-sm:    12px;
+      --shadow:       4px 4px 0 0 var(--orange);
+      --shadow-pink:  4px 4px 0 0 var(--pink);
+      --shadow-sm:    2px 2px 0 0 var(--orange);
+    }
+
+    /* ─────────────────────────────────────────────────────
+       RESET & BASE
+    ───────────────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ─────────────────────────────────────────────────────
+       UTILIDADES
+    ───────────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+
+    /* ─────────────────────────────────────────────────────
+       TIPOGRAFÍA DE MARCA
+    ───────────────────────────────────────────────────── */
+    .brand-script {
+      font-family: 'Pinyon Script', cursive;
+      color: var(--pink);
+      line-height: 1;
+    }
+
+    /* ─────────────────────────────────────────────────────
+       BOTONES — estilo "sticker brutalist cute"
+    ───────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 26px;
+      border: 2.5px solid transparent;
+      border-radius: 999px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: none !important;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: var(--white);
+      border-color: var(--orange);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-pink {
+      background: var(--pink);
+      color: var(--white);
+      border-color: var(--pink);
+      box-shadow: var(--shadow-pink);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 8px 18px;
+    }
+
+    .btn-ghost:hover { background: rgba(90,45,12,0.06); }
+
+    .btn-edit {
+      background: var(--cream);
+      color: var(--orange);
+      border-color: var(--orange);
+      box-shadow: var(--shadow-sm);
+      font-size: 0.82rem;
+      padding: 6px 14px;
+    }
+
+    .btn-delete {
+      background: var(--white);
+      color: var(--danger);
+      border-color: var(--danger);
+      font-size: 0.82rem;
+      padding: 6px 14px;
+    }
+
+    .btn-delete:hover { background: #fff0f0; }
+    .btn-full { width: 100%; }
+
+    /* ─────────────────────────────────────────────────────
+       FORMULARIOS
+    ───────────────────────────────────────────────────── */
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 11px 15px;
+      border: 2px solid var(--orange);
+      border-radius: var(--radius-sm);
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1rem;
+      background: var(--cream);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: auto;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus { border-color: var(--pink); }
+
+    textarea {
+      resize: vertical;
+      min-height: 82px;
+    }
+
+    /* ─────────────────────────────────────────────────────
+       VISTA LOGIN
+    ───────────────────────────────────────────────────── */
+    #view-login {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 40px 40px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .login-card .brand-script { font-size: 2.6rem; }
+
+    .login-card h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--orange);
+      margin: 4px 0 36px;
+    }
+
+    .login-card .btn { width: 100%; margin-top: 4px; }
+
+    .login-error {
+      margin-top: 14px;
+      color: var(--danger);
+      font-size: 0.9rem;
+      min-height: 20px;
+    }
+
+    /* ─────────────────────────────────────────────────────
+       VISTA DASHBOARD
+    ───────────────────────────────────────────────────── */
+    #view-dashboard {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 24px 48px;
+    }
+
+    /* Header del dashboard */
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      border-bottom: var(--border);
+    }
+
+    .dash-brand .brand-script { font-size: 2rem; }
+
+    .dash-brand h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--orange-light);
+    }
+
+    /* Tarjeta de tabla */
+    .table-card {
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px 26px;
+      border-bottom: 2px solid var(--cream);
+    }
+
+    .table-card-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    /* Tabla */
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    thead th {
+      background: var(--cream);
+      padding: 13px 18px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--text);
+      border-bottom: 2px solid var(--orange);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #f5e6d8;
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #fffaf7; }
+
+    .product-thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--pink);
+      display: block;
+    }
+
+    .thumb-placeholder {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      border: 2px dashed #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    /* Badges pilar */
+    .badge {
+      display: inline-block;
+      padding: 3px 13px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-desayuno {
+      background: #fff3e0;
+      color: var(--orange);
+      border: 1.5px solid var(--orange);
+    }
+
+    .badge-evento {
+      background: #fce4f3;
+      color: var(--pink);
+      border: 1.5px solid var(--pink);
+    }
+
+    /* Precio formateado */
+    .precio-cell {
+      font-weight: 600;
+      color: var(--orange);
+    }
+
+    /* Acciones por fila */
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Estados vacío / cargando */
+    .table-state {
+      padding: 52px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .table-state .icon {
+      font-size: 2.8rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .spinner-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 52px;
+    }
+
+    .spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid var(--cream);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─────────────────────────────────────────────────────
+       MODAL
+    ───────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(90, 45, 12, 0.5);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal {
+      background: var(--white);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 580px;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      border-bottom: 2px solid var(--cream);
+      flex-shrink: 0;
+    }
+
+    .modal-header h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 6px 8px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+
+    .btn-close:hover { background: var(--cream); color: var(--text); }
+
+    .modal-body {
+      padding: 24px 28px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Upload de foto */
+    .file-drop-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 18px;
+      border: 2px dashed var(--pink);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--pink);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      transition: background 0.15s;
+    }
+
+    .file-drop-label:hover { background: #fff0f8; }
+    .file-drop-label .drop-icon { font-size: 1.8rem; }
+
+    input[type="file"] { display: none; }
+
+    .file-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .file-preview img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--pink);
+      flex-shrink: 0;
+    }
+
+    .file-preview-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    .file-preview-info strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    /* Error de formulario */
+    .form-error {
+      color: var(--danger);
+      font-size: 0.88rem;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #fff0f0;
+      border-radius: 10px;
+      border: 1.5px solid #fecaca;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 28px 24px;
+      flex-shrink: 0;
+      border-top: 2px solid var(--cream);
+    }
+
+    /* ─────────────────────────────────────────────────────
+       TOASTS
+    ───────────────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 13px 20px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--white);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+      animation: toastIn 0.25s ease forwards;
+      pointer-events: auto;
+    }
+
+    .toast-success { background: var(--orange); }
+    .toast-error   { background: var(--danger); }
+
+    @keyframes toastIn {
+      from { transform: translateY(16px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    /* ─────────────────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────────────────── */
+    @media (max-width: 580px) {
+      .form-row { grid-template-columns: 1fr; }
+      .dash-header { flex-direction: column; align-items: flex-start; }
+      .login-card { padding: 36px 24px 28px; }
+      .modal-header, .modal-body, .modal-footer { padding-left: 20px; padding-right: 20px; }
+      thead th, tbody td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     VISTA LOGIN
+════════════════════════════════════════════════════════ -->
+<section id="view-login">
+  <div class="login-card">
+    <p class="brand-script">Tardes de Té</p>
+    <h1>Panel de Administración</h1>
+
+    <div class="form-group">
+      <label for="login-email">Email</label>
+      <input
+        id="login-email"
+        type="email"
+        placeholder="cami@tardesdete.com"
+        autocomplete="username"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="login-password">Contraseña</label>
+      <input
+        id="login-password"
+        type="password"
+        placeholder="••••••••"
+        autocomplete="current-password"
+      />
+    </div>
+
+    <button class="btn btn-primary" id="btn-login">Ingresar</button>
+    <p class="login-error" id="login-error" role="alert"></p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     VISTA DASHBOARD
+════════════════════════════════════════════════════════ -->
+<section id="view-dashboard" class="hidden">
+
+  <header class="dash-header">
+    <div class="dash-brand">
+      <span class="brand-script">Tardes de Té</span>
+      <h2>Panel de Administración</h2>
+    </div>
+    <button class="btn btn-ghost" id="btn-logout">Cerrar sesión</button>
+  </header>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>Catálogo de Productos</h3>
+      <button class="btn btn-pink" id="btn-add-product">+ Agregar producto</button>
+    </div>
+
+    <div class="table-wrapper">
+      <div id="table-content">
+        <!-- Se renderiza dinámicamente -->
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: CREAR / EDITAR PRODUCTO
+════════════════════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+
+    <div class="modal-header">
+      <h3 id="modal-title">Nuevo producto</h3>
+      <button class="btn-close" id="btn-modal-close" aria-label="Cerrar modal">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- ID oculto para edición -->
+      <input type="hidden" id="field-id" />
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="field-nombre">Nombre <span style="color:var(--danger)">*</span></label>
+        <input id="field-nombre" type="text" placeholder="Ej: Pack Fosforitos" />
+      </div>
+
+      <!-- Precio + Pilar -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="field-precio">Precio (ARS) <span style="color:var(--danger)">*</span></label>
+          <input id="field-precio" type="text" inputmode="numeric" placeholder="Ej: 50.000" />
+        </div>
+        <div class="form-group">
+          <label for="field-pilar">Tipo <span style="color:var(--danger)">*</span></label>
+          <select id="field-pilar">
+            <option value="">Seleccioná...</option>
+            <option value="desayuno">Desayuno</option>
+            <option value="evento">Evento</option>
+            <option value="saladito">Saladito</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Detalle -->
+      <div class="form-group">
+        <label for="field-categoria">Detalle <span style="color:var(--danger)">*</span></label>
+        <select id="field-categoria">
+          <option value="">Seleccioná...</option>
+          <optgroup label="Desayunos">
+            <option value="1 persona">1 persona</option>
+            <option value="1 persona · Premium">1 persona · Premium</option>
+          </optgroup>
+          <optgroup label="Eventos / Lunch">
+            <option value="10-12 personas">10-12 personas</option>
+            <option value="20-25 personas">20-25 personas</option>
+            <option value="30-35 personas">30-35 personas</option>
+          </optgroup>
+          <optgroup label="Saladitos / Pastelería">
+            <option value="1 Docena">1 Docena</option>
+            <option value="Por Docena">Por Docena</option>
+            <option value="18 cm">18 cm</option>
+            <option value="25 cm">25 cm</option>
+            <option value="Consultar">Consultar</option>
+          </optgroup>
+          <optgroup label="Otro">
+            <option value="Personalizado">Personalizado</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="field-descripcion">Descripción</label>
+        <textarea id="field-descripcion" placeholder="Contá qué hace especial a este producto..."></textarea>
+      </div>
+
+      <!-- Foto -->
+      <div class="form-group">
+        <label>Foto del producto</label>
+        <label class="file-drop-label" for="field-foto">
+          <span class="drop-icon">📷</span>
+          Hacé clic para elegir una imagen
+          <span style="font-weight:400;color:var(--text-muted);font-size:0.8rem">JPG, PNG o WEBP</span>
+        </label>
+        <input type="file" id="field-foto" accept="image/jpeg,image/png,image/webp" />
+
+        <div class="file-preview hidden" id="file-preview">
+          <img id="file-preview-img" src="" alt="Vista previa" />
+          <div class="file-preview-info">
+            <strong id="file-preview-name"></strong>
+            <span id="file-preview-size"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error de formulario -->
+      <p class="form-error hidden" id="form-error" role="alert"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btn-modal-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="btn-modal-save">Guardar</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Toast notifications -->
+<div id="toast-container" aria-live="polite"></div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ──────────────────────────────────────────────────────────
+   1. CONFIGURACIÓN
+   Reemplazá SUPABASE_URL y SUPABASE_ANON_KEY con los valores
+   de tu proyecto: Supabase Dashboard → Settings → API
+────────────────────────────────────────────────────────── */
+const SUPABASE_URL      = 'https://xkqzcuiizpvdtqoxkczb.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_UA9pOc9eo_kahaDvK3O5Iw_hHHn8FFK';
+const BUCKET            = 'imagenes-productos';
+const TABLE             = 'productos';
+
+/* ──────────────────────────────────────────────────────────
+   2. CLIENTE SUPABASE
+────────────────────────────────────────────────────────── */
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ──────────────────────────────────────────────────────────
+   3. REFERENCIAS AL DOM
+────────────────────────────────────────────────────────── */
+const $ = (id) => document.getElementById(id);
+
+const viewLogin       = $('view-login');
+const viewDash        = $('view-dashboard');
+const loginEmail      = $('login-email');
+const loginPassword   = $('login-password');
+const loginError      = $('login-error');
+const btnLogin        = $('btn-login');
+const btnLogout       = $('btn-logout');
+const btnAddProduct   = $('btn-add-product');
+const tableContent    = $('table-content');
+const modalOverlay    = $('modal-overlay');
+const modalTitle      = $('modal-title');
+const btnModalClose   = $('btn-modal-close');
+const btnModalCancel  = $('btn-modal-cancel');
+const btnModalSave    = $('btn-modal-save');
+const fieldId         = $('field-id');
+const fieldNombre     = $('field-nombre');
+const fieldPrecio     = $('field-precio');
+const fieldPilar      = $('field-pilar');
+const fieldCategoria  = $('field-categoria');
+const fieldDesc       = $('field-descripcion');
+const fieldFoto       = $('field-foto');
+const filePreview     = $('file-preview');
+const filePreviewImg  = $('file-preview-img');
+const filePreviewName = $('file-preview-name');
+const filePreviewSize = $('file-preview-size');
+const formError       = $('form-error');
+
+/* ──────────────────────────────────────────────────────────
+   4. ESTADO DE LA APP
+────────────────────────────────────────────────────────── */
+let products  = [];
+let editingId = null; // null = crear nuevo, string = editar existente
+
+/* ──────────────────────────────────────────────────────────
+   5. UTILIDADES UI
+────────────────────────────────────────────────────────── */
+
+/** Muestra una de las dos vistas principales */
+function showView(view) {
+  viewLogin.classList.toggle('hidden', view !== 'login');
+  viewDash.classList.toggle('hidden',  view !== 'dashboard');
+}
+
+/** Toast de notificación temporal */
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = msg;
+  $('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3600);
+}
+
+/** Activa / desactiva estado de carga en un botón */
+function setBtnLoading(btn, loading, loadingLabel = 'Cargando...') {
+  btn.disabled = loading;
+  if (loading) {
+    btn.dataset.origLabel = btn.textContent;
+    btn.textContent = loadingLabel;
+  } else {
+    btn.textContent = btn.dataset.origLabel || btn.textContent;
+  }
+}
+
+/** Escapa HTML para evitar XSS al renderizar datos de la DB */
+function escHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Formatea un número como moneda argentina */
+function formatARS(n) {
+  return Number(n).toLocaleString('es-AR', { minimumFractionDigits: 0 });
+}
+
+/** Formatea bytes a unidad legible */
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1048576).toFixed(1)} MB`;
+}
+
+/* ──────────────────────────────────────────────────────────
+   6. AUTENTICACIÓN
+────────────────────────────────────────────────────────── */
+
+/** Escucha cambios de sesión y muestra la vista correcta */
+db.auth.onAuthStateChange((_event, session) => {
+  if (session) {
+    showView('dashboard');
+    loadProducts();
+  } else {
+    showView('login');
+  }
+});
+
+/** Login con email + contraseña */
+btnLogin.addEventListener('click', async () => {
+  loginError.textContent = '';
+  const email = loginEmail.value.trim();
+  const pass  = loginPassword.value;
+
+  if (!email || !pass) {
+    loginError.textContent = 'Completá tu email y contraseña para continuar.';
+    return;
+  }
+
+  setBtnLoading(btnLogin, true, 'Ingresando...');
+
+  const { error } = await db.auth.signInWithPassword({ email, password: pass });
+
+  setBtnLoading(btnLogin, false);
+
+  if (error) {
+    loginError.textContent = 'Email o contraseña incorrectos. Intentá de nuevo.';
+    loginPassword.focus();
+  }
+});
+
+/** Permite iniciar sesión con Enter */
+loginPassword.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') btnLogin.click();
+});
+
+/** Cierre de sesión */
+btnLogout.addEventListener('click', async () => {
+  await db.auth.signOut();
+});
+
+/* ──────────────────────────────────────────────────────────
+   7. CRUD — PRODUCTOS
+────────────────────────────────────────────────────────── */
+
+/** Carga todos los productos y re-renderiza la tabla */
+async function loadProducts() {
+  tableContent.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div></div>';
+
+  const { data, error } = await db
+    .from(TABLE)
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    toast('No se pudo cargar el catálogo.', 'error');
+    tableContent.innerHTML = `
+      <div class="table-state">
+        <span class="icon">⚠️</span>
+        Error al cargar productos. Recargá la página.
+      </div>`;
+    return;
+  }
+
+  products = data ?? [];
+  renderTable();
+}
+
+/** Inserta un nuevo producto */
+async function insertProduct(payload) {
+  const { error } = await db.from(TABLE).insert([payload]);
+  if (error) throw error;
+}
+
+/** Actualiza un producto existente por ID */
+async function updateProduct(id, payload) {
+  const { error } = await db.from(TABLE).update(payload).eq('id', id);
+  if (error) throw error;
+}
+
+/** Elimina un producto por ID */
+async function deleteProduct(id) {
+  const { error } = await db.from(TABLE).delete().eq('id', id);
+  if (error) throw error;
+}
+
+/* ──────────────────────────────────────────────────────────
+   8. STORAGE — IMÁGENES
+────────────────────────────────────────────────────────── */
+
+const COMPRESS_MAX_PX  = 1200; // lado máximo en píxeles
+const COMPRESS_QUALITY = 0.82; // calidad JPEG (0–1)
+
+/**
+ * Comprime y redimensiona una imagen usando Canvas antes de subir.
+ * Siempre exporta como JPEG para consistencia y menor peso.
+ * Imágenes que ya miden ≤ MAX_PX solo se recomprimen en calidad.
+ */
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+
+      let { width, height } = img;
+      if (width > COMPRESS_MAX_PX || height > COMPRESS_MAX_PX) {
+        if (width >= height) {
+          height = Math.round((height * COMPRESS_MAX_PX) / width);
+          width  = COMPRESS_MAX_PX;
+        } else {
+          width  = Math.round((width * COMPRESS_MAX_PX) / height);
+          height = COMPRESS_MAX_PX;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error('No se pudo comprimir la imagen.')); return; }
+          const compressed = new File([blob], file.name.replace(/\.[^/.]+$/, '.jpg'), { type: 'image/jpeg' });
+          resolve(compressed);
+        },
+        'image/jpeg',
+        COMPRESS_QUALITY
+      );
+    };
+
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('No se pudo leer la imagen.')); };
+    img.src = objectUrl;
+  });
+}
+
+/**
+ * Comprime la imagen y luego la sube al bucket.
+ * Devuelve la URL pública permanente de Supabase Storage.
+ */
+async function uploadImage(file) {
+  const compressed = await compressImage(file);
+
+  const safeName = file.name
+    .replace(/\.[^/.]+$/, '')
+    .replace(/[^a-z0-9]/gi, '_')
+    .toLowerCase()
+    .slice(0, 40);
+  const path = `${Date.now()}_${safeName}.jpg`;
+
+  const { error: uploadError } = await db.storage
+    .from(BUCKET)
+    .upload(path, compressed, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
+
+  if (uploadError) throw uploadError;
+
+  const { data } = db.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/* ──────────────────────────────────────────────────────────
+   9. RENDER DE LA TABLA
+────────────────────────────────────────────────────────── */
+
+function renderTable() {
+  if (!products.length) {
+    tableContent.innerHTML = `
+      <div class="table-state">
+        <span class="icon">🍰</span>
+        Todavía no hay productos. ¡Agregá el primero!
+      </div>`;
+    return;
+  }
+
+  const rows = products.map((p) => `
+    <tr data-id="${escHtml(p.id)}">
+      <td>
+        ${p.foto_url
+          ? `<img class="product-thumb" src="${escHtml(p.foto_url)}" alt="${escHtml(p.nombre)}" loading="lazy" />`
+          : `<div class="thumb-placeholder">🍰</div>`}
+      </td>
+      <td><strong>${escHtml(p.nombre)}</strong></td>
+      <td class="precio-cell">$${formatARS(p.precio)}</td>
+      <td><span class="badge badge-${escHtml(p.pilar)}">${escHtml(p.pilar)}</span></td>
+      <td>${escHtml(p.categoria)}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn btn-edit" data-action="edit" data-id="${escHtml(p.id)}">Editar</button>
+          <button class="btn btn-delete" data-action="delete" data-id="${escHtml(p.id)}">Eliminar</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  tableContent.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th style="width:70px">Foto</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Tipo</th>
+          <th>Detalle</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  // Delegación de eventos — un solo listener para toda la tabla
+  tableContent.querySelector('tbody').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const { action, id } = btn.dataset;
+    if (action === 'edit')   openModal(id);
+    if (action === 'delete') confirmDelete(id);
+  });
+}
+
+/* ──────────────────────────────────────────────────────────
+   10. MODAL — ABRIR / CERRAR / RELLENAR
+────────────────────────────────────────────────────────── */
+
+function openModal(id = null) {
+  editingId = id;
+  hideFormError();
+  resetFilePreview();
+
+  if (id) {
+    // ── Modo edición: pre-rellena con datos existentes
+    const p = products.find((x) => x.id === id);
+    if (!p) return;
+
+    modalTitle.textContent  = 'Editar producto';
+    fieldId.value           = p.id;
+    fieldNombre.value       = p.nombre       ?? '';
+    fieldPrecio.value       = p.precio       ?? '';
+    fieldPilar.value        = p.pilar        ?? '';
+    fieldCategoria.value    = p.categoria    ?? '';
+    fieldDesc.value         = p.descripcion  ?? '';
+
+    if (p.foto_url) {
+      filePreviewImg.src          = p.foto_url;
+      filePreviewName.textContent = 'Foto actual';
+      filePreviewSize.textContent = '';
+      filePreview.classList.remove('hidden');
+    }
+  } else {
+    // ── Modo creación: limpia el formulario
+    modalTitle.textContent  = 'Nuevo producto';
+    fieldId.value           = '';
+    fieldNombre.value       = '';
+    fieldPrecio.value       = '';
+    fieldPilar.value        = '';
+    fieldCategoria.value    = '';
+    fieldDesc.value         = '';
+  }
+
+  modalOverlay.classList.remove('hidden');
+  requestAnimationFrame(() => fieldNombre.focus());
+}
+
+function closeModal() {
+  modalOverlay.classList.add('hidden');
+  editingId = null;
+}
+
+function resetFilePreview() {
+  fieldFoto.value             = '';
+  filePreviewImg.src          = '';
+  filePreviewName.textContent = '';
+  filePreviewSize.textContent = '';
+  filePreview.classList.add('hidden');
+}
+
+function showFormError(msg) {
+  formError.textContent = msg;
+  formError.classList.remove('hidden');
+}
+
+function hideFormError() {
+  formError.textContent = '';
+  formError.classList.add('hidden');
+}
+
+/* ── Listeners del modal ── */
+btnAddProduct.addEventListener('click', () => openModal());
+btnModalClose.addEventListener('click', closeModal);
+btnModalCancel.addEventListener('click', closeModal);
+
+// Cerrar al hacer clic fuera del panel
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target === modalOverlay) closeModal();
+});
+
+// Cerrar con Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal();
+});
+
+// Preview + estimación del tamaño comprimido
+fieldFoto.addEventListener('change', async () => {
+  const file = fieldFoto.files[0];
+  if (!file) { resetFilePreview(); return; }
+
+  filePreviewImg.src          = URL.createObjectURL(file);
+  filePreviewName.textContent = file.name;
+  filePreviewSize.textContent = `Original: ${formatBytes(file.size)} — comprimiendo…`;
+  filePreview.classList.remove('hidden');
+
+  try {
+    const compressed = await compressImage(file);
+    filePreviewSize.textContent = `${formatBytes(file.size)} → ${formatBytes(compressed.size)} ✓`;
+  } catch {
+    filePreviewSize.textContent = formatBytes(file.size);
+  }
+});
+
+/* ──────────────────────────────────────────────────────────
+   11. GUARDAR PRODUCTO (crear o editar)
+────────────────────────────────────────────────────────── */
+btnModalSave.addEventListener('click', async () => {
+  hideFormError();
+
+  // ── Leer y validar campos
+  const nombre      = fieldNombre.value.trim();
+  const precioRaw   = fieldPrecio.value;
+  // Soporta formato ARS con puntos: "50.000" → 50000, "50,000" → 50000
+  const precio      = parseInt(precioRaw.replace(/[.,\s]/g, ''), 10);
+  const pilar       = fieldPilar.value;
+  const categoria   = fieldCategoria.value;
+  const descripcion = fieldDesc.value.trim();
+  const file        = fieldFoto.files[0];
+
+  if (!nombre)                   return showFormError('El nombre del producto es obligatorio.');
+  if (!precioRaw.trim() || isNaN(precio) || precio < 0)
+                                 return showFormError('Ingresá un precio válido. Ej: 50.000');
+  if (!pilar)                    return showFormError('Seleccioná el tipo del producto.');
+  if (!categoria)                return showFormError('Seleccioná el detalle del producto.');
+
+  setBtnLoading(btnModalSave, true, 'Guardando...');
+
+  try {
+    // ── Si hay imagen nueva, subirla primero y obtener la URL
+    let foto_url = null;
+    if (file) {
+      foto_url = await uploadImage(file);
+    }
+
+    // Payload base (sin foto_url si no cambió)
+    const payload = { nombre, precio, pilar, categoria, descripcion };
+    if (foto_url) payload.foto_url = foto_url;
+
+    if (editingId) {
+      await updateProduct(editingId, payload);
+      toast('Producto actualizado correctamente ✓');
+    } else {
+      await insertProduct(payload);
+      toast('Producto creado correctamente ✓');
+    }
+
+    closeModal();
+    await loadProducts();
+
+  } catch (err) {
+    const msg = err?.message ?? 'Ocurrió un error inesperado.';
+    showFormError(`Error al guardar: ${msg}`);
+    toast('No se pudo guardar el producto.', 'error');
+  } finally {
+    setBtnLoading(btnModalSave, false);
+  }
+});
+
+/* ──────────────────────────────────────────────────────────
+   12. ELIMINAR PRODUCTO
+────────────────────────────────────────────────────────── */
+async function confirmDelete(id) {
+  const p = products.find((x) => x.id === id);
+  const nombre = p?.nombre ?? 'este producto';
+
+  if (!confirm(`¿Eliminar "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
+
+  try {
+    await deleteProduct(id);
+    toast(`"${nombre}" eliminado.`);
+    await loadProducts();
+  } catch (err) {
+    toast(`Error al eliminar: ${err?.message ?? ''}`, 'error');
+  }
+}
+</script>
+
+</body>
+</html>
