@@ -595,11 +595,11 @@
     <h1>Panel de Administración</h1>
 
     <div class="form-group">
-      <label for="login-email">Email</label>
+      <label for="login-usuario">Usuario</label>
       <input
-        id="login-email"
-        type="email"
-        placeholder="cami@tardesdete.com"
+        id="login-usuario"
+        type="text"
+        placeholder="Cami"
         autocomplete="username"
       />
     </div>
@@ -804,7 +804,7 @@ const $ = (id) => document.getElementById(id);
 
 const viewLogin       = $('view-login');
 const viewDash        = $('view-dashboard');
-const loginEmail      = $('login-email');
+const loginUsuario    = $('login-usuario');
 const loginPassword   = $('login-password');
 const loginError      = $('login-error');
 const btnLogin        = $('btn-login');
@@ -965,16 +965,19 @@ db.auth.onAuthStateChange((_event, session) => {
   }
 });
 
-/** Login con email + contraseña */
+/** Login con usuario + contraseña */
 btnLogin.addEventListener('click', async () => {
   loginError.textContent = '';
-  const email = loginEmail.value.trim();
-  const pass  = loginPassword.value;
+  const raw  = loginUsuario.value.trim();
+  const pass = loginPassword.value;
 
-  if (!email || !pass) {
-    loginError.textContent = 'Completá tu email y contraseña para continuar.';
+  if (!raw || !pass) {
+    loginError.textContent = 'Completá tu usuario y contraseña para continuar.';
     return;
   }
+
+  // Si escriben un email completo lo usa directo; si no, agrega el dominio interno
+  const email = raw.includes('@') ? raw : `${raw.toLowerCase()}@tardesdete.admin`;
 
   setBtnLoading(btnLogin, true, 'Ingresando...');
 
