@@ -24,16 +24,37 @@ CREATE INDEX IF NOT EXISTS productos_pilar_idx ON public.productos (pilar);
 
 
 -- ------------------------------------------------------------
--- 2. ROW LEVEL SECURITY — tabla productos
+-- 2. HELPER: auth.is_admin()
+-- Lee app_metadata.role del JWT. Configurar en:
+-- Dashboard > Authentication > Users > Edit > App Metadata: {"role":"admin"}
+-- ------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION auth.is_admin()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT coalesce(
+    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin',
+    false
+  )
+$$;
+
+
+-- ------------------------------------------------------------
+-- 3. ROW LEVEL SECURITY — tabla productos
 -- ------------------------------------------------------------
 
 ALTER TABLE public.productos ENABLE ROW LEVEL SECURITY;
 
--- Eliminamos las políticas si ya existen para evitar errores en re-ejecuciones
 DROP POLICY IF EXISTS "Lectura pública de productos"      ON public.productos;
 DROP POLICY IF EXISTS "Insertar productos (autenticado)"  ON public.productos;
+DROP POLICY IF EXISTS "Insertar productos (admin)"        ON public.productos;
 DROP POLICY IF EXISTS "Actualizar productos (autenticado)" ON public.productos;
+DROP POLICY IF EXISTS "Actualizar productos (admin)"      ON public.productos;
 DROP POLICY IF EXISTS "Eliminar productos (autenticado)"  ON public.productos;
+DROP POLICY IF EXISTS "Eliminar productos (admin)"        ON public.productos;
 
 -- Lectura pública: cualquier visitante (anon) puede ver el catálogo
 CREATE POLICY "Lectura pública de productos"
@@ -41,24 +62,22 @@ CREATE POLICY "Lectura pública de productos"
   FOR SELECT
   USING (true);
 
--- Solo usuarios autenticados pueden crear productos
-CREATE POLICY "Insertar productos (autenticado)"
+-- Solo admin puede crear/editar/eliminar productos
+CREATE POLICY "Insertar productos (admin)"
   ON public.productos
   FOR INSERT
-  WITH CHECK (auth.role() = 'authenticated');
+  WITH CHECK (auth.is_admin());
 
--- Solo usuarios autenticados pueden editar productos
-CREATE POLICY "Actualizar productos (autenticado)"
+CREATE POLICY "Actualizar productos (admin)"
   ON public.productos
   FOR UPDATE
-  USING  (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
+  USING  (auth.is_admin())
+  WITH CHECK (auth.is_admin());
 
--- Solo usuarios autenticados pueden eliminar productos
-CREATE POLICY "Eliminar productos (autenticado)"
+CREATE POLICY "Eliminar productos (admin)"
   ON public.productos
   FOR DELETE
-  USING (auth.role() = 'authenticated');
+  USING (auth.is_admin());
 
 
 -- ------------------------------------------------------------
@@ -90,27 +109,25 @@ CREATE POLICY "Lectura pública de imágenes"
   FOR SELECT
   USING (bucket_id = 'imagenes-productos');
 
--- Solo usuarios autenticados pueden subir imágenes
-CREATE POLICY "Subir imágenes (autenticado)"
+-- Solo admin puede subir/reemplazar/borrar imágenes
+CREATE POLICY "Subir imágenes (admin)"
   ON storage.objects
   FOR INSERT
   WITH CHECK (
     bucket_id = 'imagenes-productos'
-    AND auth.role() = 'authenticated'
+    AND auth.is_admin()
   );
 
--- Solo usuarios autenticados pueden reemplazar imágenes (upsert)
-CREATE POLICY "Actualizar imágenes (autenticado)"
+CREATE POLICY "Actualizar imágenes (admin)"
   ON storage.objects
   FOR UPDATE
-  USING  (bucket_id = 'imagenes-productos' AND auth.role() = 'authenticated')
-  WITH CHECK (bucket_id = 'imagenes-productos' AND auth.role() = 'authenticated');
+  USING  (bucket_id = 'imagenes-productos' AND auth.is_admin())
+  WITH CHECK (bucket_id = 'imagenes-productos' AND auth.is_admin());
 
--- Solo usuarios autenticados pueden borrar imágenes
-CREATE POLICY "Eliminar imágenes (autenticado)"
+CREATE POLICY "Eliminar imágenes (admin)"
   ON storage.objects
   FOR DELETE
   USING (
     bucket_id = 'imagenes-productos'
-    AND auth.role() = 'authenticated'
+    AND auth.is_admin()
   );

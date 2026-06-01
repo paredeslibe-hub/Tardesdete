@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Tardes de Té</title>
 
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#FF5A00" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Admin Té" />
+  <link rel="apple-touch-icon" href="/icon@2x.png" />
+
   <!-- Google Fonts: Fredoka + Pinyon Script -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -748,6 +756,24 @@
 <!-- Toast notifications -->
 <div id="toast-container" aria-live="polite"></div>
 
+<!-- Modal: advertencia de inactividad -->
+<div class="modal-overlay hidden" id="inactivity-overlay" role="alertdialog" aria-modal="true" aria-labelledby="inactivity-title">
+  <div class="modal" style="max-width:380px;text-align:center;">
+    <div class="modal-header" style="justify-content:center;border-bottom:none;padding-bottom:0;">
+      <h3 id="inactivity-title" style="font-size:1.3rem;">¿Seguís ahí?</h3>
+    </div>
+    <div class="modal-body" style="padding-top:0.75rem;gap:1rem;">
+      <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.5;">
+        Por seguridad, la sesión se cerrará en<br>
+        <strong id="inactivity-countdown" style="color:var(--orange);font-size:1.6rem;">60</strong> segundos.
+      </p>
+      <button class="btn btn-primary" id="btn-inactivity-continue" style="width:100%;">
+        Seguir conectada
+      </button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ═══════════════════════════════════════════════════════
      JAVASCRIPT
@@ -802,6 +828,10 @@ const filePreviewImg  = $('file-preview-img');
 const filePreviewName = $('file-preview-name');
 const filePreviewSize = $('file-preview-size');
 const formError       = $('form-error');
+
+const inactivityOverlay   = $('inactivity-overlay');
+const inactivityCountdown = $('inactivity-countdown');
+const btnInactivityCont   = $('btn-inactivity-continue');
 
 /* ──────────────────────────────────────────────────────────
    4. ESTADO DE LA APP
@@ -861,7 +891,66 @@ function formatBytes(bytes) {
 }
 
 /* ──────────────────────────────────────────────────────────
-   6. AUTENTICACIÓN
+   6. INACTIVIDAD — cierre automático de sesión
+────────────────────────────────────────────────────────── */
+
+const INACTIVITY_WARN_MS = 14 * 60 * 1000; // aviso a los 14 min
+const ACTIVITY_EVENTS    = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+
+let inactivityTimer  = null;
+let countdownTimer   = null;
+let countdownSeconds = 60;
+
+function resetInactivity() {
+  // No reiniciar si el aviso ya está visible
+  if (!inactivityOverlay.classList.contains('hidden')) return;
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(showInactivityWarning, INACTIVITY_WARN_MS);
+}
+
+function showInactivityWarning() {
+  countdownSeconds = 60;
+  inactivityCountdown.textContent = countdownSeconds;
+  inactivityOverlay.classList.remove('hidden');
+
+  countdownTimer = setInterval(() => {
+    countdownSeconds--;
+    inactivityCountdown.textContent = countdownSeconds;
+    if (countdownSeconds <= 0) {
+      clearInterval(countdownTimer);
+      doAutoSignOut();
+    }
+  }, 1000);
+}
+
+function dismissInactivityWarning() {
+  clearInterval(countdownTimer);
+  inactivityOverlay.classList.add('hidden');
+  resetInactivity();
+}
+
+async function doAutoSignOut() {
+  stopInactivityWatcher();
+  inactivityOverlay.classList.add('hidden');
+  await db.auth.signOut();
+  toast('Sesión cerrada por inactividad.', 'error');
+}
+
+function startInactivityWatcher() {
+  ACTIVITY_EVENTS.forEach(e => document.addEventListener(e, resetInactivity, { passive: true }));
+  resetInactivity();
+}
+
+function stopInactivityWatcher() {
+  clearTimeout(inactivityTimer);
+  clearInterval(countdownTimer);
+  ACTIVITY_EVENTS.forEach(e => document.removeEventListener(e, resetInactivity));
+}
+
+btnInactivityCont.addEventListener('click', dismissInactivityWarning);
+
+/* ──────────────────────────────────────────────────────────
+   7. AUTENTICACIÓN
 ────────────────────────────────────────────────────────── */
 
 /** Escucha cambios de sesión y muestra la vista correcta */
@@ -869,8 +958,10 @@ db.auth.onAuthStateChange((_event, session) => {
   if (session) {
     showView('dashboard');
     loadProducts();
+    startInactivityWatcher();
   } else {
     showView('login');
+    stopInactivityWatcher();
   }
 });
 
@@ -904,6 +995,7 @@ loginPassword.addEventListener('keydown', (e) => {
 
 /** Cierre de sesión */
 btnLogout.addEventListener('click', async () => {
+  stopInactivityWatcher();
   await db.auth.signOut();
 });
 
@@ -1258,6 +1350,14 @@ async function confirmDelete(id) {
     toast(`Error al eliminar: ${err?.message ?? ''}`, 'error');
   }
 }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/sw.js').catch(function () {});
+    });
+  }
 </script>
 
 </body>
