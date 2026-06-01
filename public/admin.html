@@ -575,12 +575,60 @@
     /* ─────────────────────────────────────────────────────
        RESPONSIVE
     ───────────────────────────────────────────────────── */
-    @media (max-width: 580px) {
+    /* Indicador de scroll horizontal */
+    .table-scroll-wrap { position: relative; }
+
+    .table-scroll-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 52px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.96));
+      pointer-events: none;
+      border-radius: 0 0 var(--radius) 0;
+      transition: opacity 0.25s;
+      display: none;
+    }
+
+    .table-scroll-wrap.at-end::after { opacity: 0; }
+
+    .scroll-hint {
+      display: none;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      padding: 5px 0 10px;
+      letter-spacing: 0.04em;
+      user-select: none;
+    }
+
+    @media (max-width: 640px) {
       .form-row { grid-template-columns: 1fr; }
       .dash-header { flex-direction: column; align-items: flex-start; }
       .login-card { padding: 36px 24px 28px; }
       .modal-header, .modal-body, .modal-footer { padding-left: 20px; padding-right: 20px; }
       thead th, tbody td { padding: 10px 12px; }
+
+      /* Gradiente y hint de scroll */
+      .table-scroll-wrap::after { display: block; }
+      .scroll-hint { display: block; }
+
+      /* Ocultar columnas Tipo y Detalle para que quepan las acciones */
+      table th:nth-child(4), table td:nth-child(4),
+      table th:nth-child(5), table td:nth-child(5) { display: none; }
+
+      /* Botones acción: solo icono en mobile */
+      .btn-edit, .btn-delete {
+        font-size: 0;
+        padding: 7px 10px;
+        min-width: 36px;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-edit::after  { content: '✏️'; font-size: 1rem; }
+      .btn-delete::after { content: '🗑️'; font-size: 1rem; }
     }
   </style>
 </head>
@@ -639,12 +687,15 @@
       <button class="btn btn-pink" id="btn-add-product">+ Agregar producto</button>
     </div>
 
-    <div class="table-wrapper">
-      <div id="table-content">
-        <!-- Se renderiza dinámicamente -->
-        <div class="spinner-wrap"><div class="spinner"></div></div>
+    <div class="table-scroll-wrap">
+      <div class="table-wrapper">
+        <div id="table-content">
+          <!-- Se renderiza dinámicamente -->
+          <div class="spinner-wrap"><div class="spinner"></div></div>
+        </div>
       </div>
     </div>
+    <p class="scroll-hint" aria-hidden="true">← deslizá para ver más →</p>
   </div>
 
 </section>
@@ -828,6 +879,15 @@ const filePreviewImg  = $('file-preview-img');
 const filePreviewName = $('file-preview-name');
 const filePreviewSize = $('file-preview-size');
 const formError       = $('form-error');
+
+const tableScrollWrap = document.querySelector('.table-scroll-wrap');
+const tableWrapper    = document.querySelector('.table-wrapper');
+if (tableWrapper && tableScrollWrap) {
+  tableWrapper.addEventListener('scroll', () => {
+    const atEnd = tableWrapper.scrollLeft + tableWrapper.clientWidth >= tableWrapper.scrollWidth - 8;
+    tableScrollWrap.classList.toggle('at-end', atEnd);
+  }, { passive: true });
+}
 
 const inactivityOverlay   = $('inactivity-overlay');
 const inactivityCountdown = $('inactivity-countdown');
